@@ -35,8 +35,8 @@ public:
         redisReply *reply_push_Queue= (redisReply*) redisCommand(c,"ZADD Job %f %s", score, job_id.c_str());
 
         // push whole job to hash
-        redisReply *reply_push_job= (redisReply*) redisCommand(c,"HSET Job:%llu  job_id %llu idempotent_key %s type %s payload %s priority %f run_at %llu status %s attempt %d max_retries %d next_retry_at %d",
-        job.job_id,
+        redisReply *reply_push_job= (redisReply*) redisCommand(c,"HSET Job:%s  job_id %llu idempotent_key %s type %s payload %s priority %f run_at %llu status %s attempt %d max_retries %d next_retry_at %d",
+        job_id.c_str(),
         job.job_id, 
         job.idempotent_key.c_str(), 
         job.type.c_str(), 
@@ -66,22 +66,29 @@ public:
         return result_status;
     }
     void R_queue_pop(){
-        redisReply *reply= (redisReply*)redisCommand(c, "ZMPOP 1 Job MIN");
-        if (reply == nullptr) return;
+        redisReply *pop_job= (redisReply*)redisCommand(c, "ZMPOP 1 Job MIN");
+        
+        if (pop_job == nullptr) return;
 
-        if (reply->type == REDIS_REPLY_NIL || reply->elements == 0) {
+        if (pop_job->type == REDIS_REPLY_NIL || pop_job->elements == 0) {
             std::cout << "Queue is empty.\n";
-            freeReplyObject(reply);
+            freeReplyObject(pop_job);
             return;
         }
 
         // ZPOPMIN returns a flat array: [ "member", "score" ]
-        std::string popped_job_id = reply->element[1]->element[0]->element[0]->str;
-        std::string popped_score  = reply->element[1]->element[0]->element[1]->str;
+        std::string popped_job_id = pop_job->element[1]->element[0]->element[0]->str;
+        std::string popped_score  = pop_job->element[1]->element[0]->element[1]->str;
+
+        redisReply *job_data= (redisReply*)redisCommand(c, "HGETALL Job:%s", popped_job_id.c_str());
 
         std::cout << "Popped Job ID: " << popped_job_id << " with Score: " << popped_score << "\n";
-
-        freeReplyObject(reply);
+        int count = job_data->elements;
+        for(int i=0;i<count;i+=2){
+            std::cout<<job_data->element[i]->str<<" : "<<job_data->element[i+1]->str<<"\n";
+        }
+        freeReplyObject(job_data);
+        freeReplyObject(pop_job);
         
     }
     
@@ -92,7 +99,7 @@ int main(){
     R_queue redisQ;
     Job payoutJob; // Changed type to lowercase 'job' to match your header
 
-    // 1. Core Identification
+  
     payoutJob.job_id = 98227410293ULL;
     payoutJob.idempotent_key = "tx_unq_908123a8f"; 
     payoutJob.type = "process_payment";
@@ -125,7 +132,7 @@ int main(){
     payoutJob.error = {};  
     
     redisQ.R_queue_push(payoutJob);
-    // redisQ.pop();
+    redisQ.R_queue_pop();
     return 0;
 }
 
