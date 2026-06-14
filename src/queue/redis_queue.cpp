@@ -25,49 +25,53 @@ R_queue:: ~R_queue(){
 
 // push for queue
 std:: string R_queue:: R_queue_push(Job job){
-    std::string Job_payload= std::to_string(job.job_id);
+        std::string job_id= std::to_string(job.job_id);
+        std::string job_json= json(job).dump();
         auto now= std::chrono::system_clock::now();
         auto ms= std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
         double score= (double)job.priority * 1e12 + ms;
 
-        redisReply *reply= (redisReply*) redisCommand(c,"ZADD Job %f %s", score, Job_payload.c_str());
-        std::string result_status;
+        redisReply *push_job= (redisReply*) redisCommand(c,"ZADD Job %f %s", score, job_id.c_str()); 
+        redisReply *push_job_json= (redisReply*) redisCommand(c,"Set Job:%s %s", job_id.c_str(),job_json.c_str());
 
-        if (reply->type == REDIS_REPLY_INTEGER) {
+
+        std::string result_status;
+        if (push_job->type == REDIS_REPLY_INTEGER) {
             // ZADD returns an integer (1 if added, 0 if already existed/updated)
-            result_status = "SUCCESS: Elements added/updated: " + std::to_string(reply->integer);
+            result_status = "SUCCESS: Elements added/updated: " + std::to_string(push_job->integer);
         } 
-        else if (reply->type == REDIS_REPLY_ERROR) {
-            result_status = "REDIS ERROR: " + std::string(reply->str);
+        else if (push_job->type == REDIS_REPLY_ERROR) {
+            result_status = "REDIS ERROR: " + std::string(push_job->str);
         } 
         else {
             result_status = "UNKNOWN RESPONSE";
         }
 
         // Always free the pointer before exiting the function
-        freeReplyObject(reply); 
+        freeReplyObject(push_job); 
         
         return result_status;
 }
 
 // pop from queue
 std::string R_queue::R_queue_pop(){
-        redisReply *reply= (redisReply*)redisCommand(c, "ZMPOP 1 Job MIN");
-        if (reply == nullptr) return "";
+        redisReply *pop_job= (redisReply*)redisCommand(c, "ZMPOP 1 Job MIN");
+        if (pop_job == nullptr) return "";
 
-        if (reply->type == REDIS_REPLY_NIL || reply->elements == 0) {
+        if (pop_job->type == REDIS_REPLY_NIL || pop_job->elements == 0) {
             std::cout << "Queue is empty.\n";
-            freeReplyObject(reply);
+            freeReplyObject(pop_job);
             return "";
         }
 
         // ZPOPMIN returns a flat array: [ "member", "score" ]
-        std::string popped_job_id = reply->element[1]->element[0]->element[0]->str;
-        std::string popped_score  = reply->element[1]->element[0]->element[1]->str;
+        std::string popped_job_id = pop_job->element[1]->element[0]->element[0]->str;
+        std::string popped_score  = pop_job->element[1]->element[0]->element[1]->str;
 
         std::cout << "Popped Job ID: " << popped_job_id << " with Score: " << popped_score << "\n";
-
-        freeReplyObject(reply);
+        redisReply *pop_job_json= (redisReply*) redisCommand(c,"GET Job:%s",popped_job_id);
+        cout<< pop_job_json->str;
+        freeReplyObject(pop_job);
         return popped_job_id;
         
     }
