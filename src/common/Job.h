@@ -5,6 +5,8 @@
 #include<iostream>
 #include<string>
 
+
+
 struct Job
 {
     JobId job_id;
@@ -21,11 +23,16 @@ struct Job
     Time started_at;
     Time completed_at;
     json result;
-    json error;
-
-   
-
+    json error;   
 };
-
+NLOHMANN_JSON_SERIALIZE_ENUM(Status, {
+    {Status::PENDING, "pending"},
+    {Status::PROCESSING, "processing"},
+    {Status::DONE, "done"},
+    {Status::FAILED, "failed"},
+    {Status::DEAD, "dead"},
+})
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Job, job_id, idempotent_key, type, payload,
+    priority, run_at, status, attempts, max_retries, next_retry_at)
 
 #endif

@@ -3,6 +3,7 @@
 #include<hiredis/hiredis.h>
 #include "../common/Job.h"
 #include<string>
+#include <optional>
 struct R_queue{
 public:
 
@@ -10,7 +11,7 @@ public:
     R_queue();
     ~R_queue();
     std::string R_queue_push(Job job);
-    Job R_queue_pop();
+    std::optional<Job> R_queue_pop();
 };
 
 

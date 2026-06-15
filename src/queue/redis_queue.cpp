@@ -3,6 +3,7 @@
 // #include "../common/Job.h"
 #include "redis_queue.h"
 
+
 //constructor
 R_queue::R_queue(){
     c= redisConnect("127.0.0.1",6379);
@@ -54,18 +55,19 @@ std:: string R_queue:: R_queue_push(Job job){
 }
 
 // pop from queue
-Job R_queue::R_queue_pop(){
+std::optional<Job> R_queue::R_queue_pop(){
         Job result_job;
         redisReply *pop_job= (redisReply*)redisCommand(c, "ZMPOP 1 Job MIN");
         if (pop_job == nullptr){
-            result_job.error= "Job not found";
-            return result_job;
+           
+            return std::nullopt;
         }
 
         if (pop_job->type == REDIS_REPLY_NIL || pop_job->elements == 0) {
-            result_job.error= "Queue is empty.";
+            
             freeReplyObject(pop_job);
-            return result_job;
+            return std::nullopt;
+
         }
 
         // ZPOPMIN returns a flat array: [ "member", "score" ]
@@ -75,9 +77,27 @@ Job R_queue::R_queue_pop(){
         std::cout << "Popped Job ID: " << popped_job_id << " with Score: " << popped_score << "\n";
 
 
-        redisReply *pop_job_json= (redisReply*) redisCommand(c,"GET Job:%s",popped_job_id);
+        redisReply *pop_job_json= (redisReply*) redisCommand(c,"GET Job:%s",popped_job_id.c_str());
+        if (pop_job_json == NULL) {
+            printf("Fatal Error: Failed to execute Redis command.\n");
+        }
+        else {
+            // 3. Check the type of the reply
+            
+            if (pop_job_json->type == REDIS_REPLY_NIL) {
+                printf("Key does not exist in Redis.\n");
+            } 
+            else if (pop_job_json->type == REDIS_REPLY_ERROR) {
+                // Redis returned an error message
+                printf("Redis Error: %s\n", pop_job_json->str);
+            } 
+            else {
+                printf("Unexpected Redis reply type: %d\n", pop_job_json->type);
+            }
+        }
         json j= json::parse(pop_job_json->str);
         result_job= j.get<Job>();
+        result_job.error["Job_pop_status"] = "Sucsses";
         freeReplyObject(pop_job_json);
         freeReplyObject(pop_job);
         return result_job;

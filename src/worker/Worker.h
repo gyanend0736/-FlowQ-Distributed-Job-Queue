@@ -1,6 +1,6 @@
 #ifndef Worker_h
 #define Worker_h
-#include "../common/Types.h"
+
 #include<iostream>
 #include<string>    
 #include<hiredis/hiredis.h>
@@ -15,8 +15,8 @@ struct Worker
     JobId current_jobId;
     Worker();
     ~Worker();
-    void process(std::string job_id);
-    void run(R_queue q);
+    void process(Job job_id);
+    void run(R_queue& q);
 
 };
 #endif
