@@ -10,7 +10,7 @@ public:
     R_queue();
     ~R_queue();
     std::string R_queue_push(Job job);
-    std::string R_queue_pop();
+    Job R_queue_pop();
 };
 
 

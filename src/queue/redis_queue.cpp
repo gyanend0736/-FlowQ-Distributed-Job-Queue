@@ -1,6 +1,6 @@
 #include<iostream>
 #include<chrono>
-#include "../common/Job.h"
+// #include "../common/Job.h"
 #include "redis_queue.h"
 
 //constructor
@@ -54,14 +54,18 @@ std:: string R_queue:: R_queue_push(Job job){
 }
 
 // pop from queue
-std::string R_queue::R_queue_pop(){
+Job R_queue::R_queue_pop(){
+        Job result_job;
         redisReply *pop_job= (redisReply*)redisCommand(c, "ZMPOP 1 Job MIN");
-        if (pop_job == nullptr) return "";
+        if (pop_job == nullptr){
+            result_job.error= "Job not found";
+            return result_job;
+        }
 
         if (pop_job->type == REDIS_REPLY_NIL || pop_job->elements == 0) {
-            std::cout << "Queue is empty.\n";
+            result_job.error= "Queue is empty.";
             freeReplyObject(pop_job);
-            return "";
+            return result_job;
         }
 
         // ZPOPMIN returns a flat array: [ "member", "score" ]
@@ -69,9 +73,13 @@ std::string R_queue::R_queue_pop(){
         std::string popped_score  = pop_job->element[1]->element[0]->element[1]->str;
 
         std::cout << "Popped Job ID: " << popped_job_id << " with Score: " << popped_score << "\n";
+
+
         redisReply *pop_job_json= (redisReply*) redisCommand(c,"GET Job:%s",popped_job_id);
-        cout<< pop_job_json->str;
+        json j= json::parse(pop_job_json->str);
+        result_job= j.get<Job>();
+        freeReplyObject(pop_job_json);
         freeReplyObject(pop_job);
-        return popped_job_id;
+        return result_job;
         
     }
