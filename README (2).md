@@ -11,7 +11,7 @@ A distributed job queue system built in C++ with priority scheduling, fault-tole
 
 ---
 
-## What is FlowQ?
+
 
 FlowQ is a production-grade distributed job queue that lets client applications submit background jobs via a REST API. Jobs are scheduled by priority, processed by a horizontally scalable worker pool, and automatically retried on failure with exponential backoff. Failed jobs that exceed the retry limit are moved to a dead-letter queue for manual inspection.
 
