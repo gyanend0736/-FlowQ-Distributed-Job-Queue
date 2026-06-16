@@ -28,9 +28,11 @@ R_queue:: ~R_queue(){
 std:: string R_queue:: R_queue_push(Job job){
         std::string job_id= std::to_string(job.job_id);
         std::string job_json= json(job).dump();
+
         auto now= std::chrono::system_clock::now();
         auto ms= std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-        double score= (double)job.priority * 1e12 + ms;
+        auto delay_ms= job.next_retry_at*1000;
+        double score= (double)job.priority * 1e12 + ms+ delay_ms;
 
         redisReply *push_job= (redisReply*) redisCommand(c,"ZADD Job %f %s", score, job_id.c_str()); 
         redisReply *push_job_json= (redisReply*) redisCommand(c,"Set Job:%s %s", job_id.c_str(),job_json.c_str());
@@ -102,4 +104,21 @@ std::optional<Job> R_queue::R_queue_pop(){
         freeReplyObject(pop_job);
         return result_job;
         
-    }
+}
+
+
+void R_queue::R_queue_delete(JobId job_id){
+    std::string job_id_str= std::to_string(job_id);
+    redisReply *delete_job= (redisReply*)redisCommand(c,"DEL Job:%s", job_id_str.c_str());
+    freeReplyObject(delete_job);
+}
+
+
+void R_queue::R_queue_dead(JobId job_id){
+    std::string job_id_str= std::to_string(job_id);
+    redisReply *dead_job_pull= (redisReply*)redisCommand(c,"GET Job:%s", job_id_str.c_str());
+    std::string job_json= dead_job_pull->str;
+    redisReply *dead_job_push= (redisReply*)redisCommand(c, "SET Dead:%s %s" ,job_id_str.c_str(),job_json.c_str());
+    freeReplyObject(dead_job_pull);
+    freeReplyObject(dead_job_push);
+}

@@ -12,6 +12,8 @@ public:
     ~R_queue();
     std::string R_queue_push(Job job);
     std::optional<Job> R_queue_pop();
+    void R_queue_delete(JobId job_id);
+    void R_queue_dead(Job job);
 };
 
 
