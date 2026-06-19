@@ -47,21 +47,56 @@ void DB::insert_dead_job(Job job){
     std::cout<<"kdjkf";
 }
 void DB::update_job(Job job){
-    std::cout<<"jdkjks";
+    std::string s_status= "pending";
+    std::string s_attempts= std::to_string(job.attempts);
+    std::string s_job_id= std::to_string(job.job_id);
+    std::string s_result = job.result.dump();
+    const char* values[]= {
+        s_status.c_str(),
+        s_attempts.c_str(),
+        s_result.c_str(),
+        s_job_id.c_str()
+    };
+    PGresult *res= PQexecParams(conn,
+        "UPDATE jobs SET status=$1, attempts=$2, result=$3, completed_at=NOW() where job_id=$4",
+        4,
+        NULL,
+        values,
+        NULL,
+        NULL,
+        0
+    );
+    PQclear(res); // add this after the error checks
 }
 int main(){
+    int main(){
     DB db;
+    
+    // 1. Insert a job
     Job job;
-    job.job_id = 11111111ULL;
-    job.idempotent_key = "test_key_001";
-    job.type = "send_email";
-    job.payload = {{"to", "test@example.com"}, {"subject", "Hello"}};
+    job.job_id = 22222222ULL;
+    job.idempotent_key = "test_update_001";
+    job.type = "process_payment";
+    job.payload = {{"amount", 5000}, {"currency", "INR"}};
     job.priority = 1;
     job.status = Status::PENDING;
     job.attempts = 0;
     job.max_retries = 3;
+    job.result = {};
+    job.error = {};
 
     db.insert_job(job);
     std::cout << "Job inserted\n";
+
+    // 2. Simulate job completing — update it
+    job.attempts = 1;
+    job.status = Status::DONE;
+    job.result = {{"transaction_id", "txn_abc123"}, {"message", "payment success"}};
+
+    db.update_job(job);
+    std::cout << "Job updated\n";
+
+    return 0;
+}
     return 0;
 }
