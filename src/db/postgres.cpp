@@ -43,9 +43,41 @@ void DB::insert_job(Job job){
     }
     PQclear(res);
 }
+
 void DB::insert_dead_job(Job job){
-    std::cout<<"kdjkf";
+     std::string s_job_id= std::to_string(job.job_id);
+    std::string s_payload= job.payload.dump();
+    std::string s_priority= std::to_string(job.priority);
+    std::string s_status= "pending";
+    std::string s_attempts= std::to_string(job.attempts);
+    std::string s_max_retries= std::to_string(job.max_retries);
+    const char* values[]= {
+        s_job_id.c_str(),
+        job.idempotent_key.c_str(),
+        job.type.c_str(),
+        s_payload.c_str(),
+        s_priority.c_str(),
+        s_status.c_str(),
+        s_attempts.c_str(),
+        s_max_retries.c_str()
+    };
+    PGresult* res=PQexecParams(conn,
+        "INSERT INTO dead_letter_queue (job_id,idempotent_key, type, payload,priority, status, attempts, max_retries) "
+        "VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+        8,
+        NULL,
+        values,
+        NULL,
+        NULL,
+        0
+
+    );
+    if(PQresultStatus(res) != PGRES_COMMAND_OK){
+        std::cerr << PQerrorMessage(conn) << "\n";
+    }
+    PQclear(res);
 }
+
 void DB::update_job(Job job){
     std::string s_status= "pending";
     std::string s_attempts= std::to_string(job.attempts);
@@ -68,10 +100,10 @@ void DB::update_job(Job job){
     );
     PQclear(res); // add this after the error checks
 }
+
 int main(){
-    int main(){
     DB db;
-    
+
     // 1. Insert a job
     Job job;
     job.job_id = 22222222ULL;
@@ -96,7 +128,5 @@ int main(){
     db.update_job(job);
     std::cout << "Job updated\n";
 
-    return 0;
-}
     return 0;
 }
