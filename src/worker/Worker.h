@@ -5,6 +5,7 @@
 #include<string>    
 #include<hiredis/hiredis.h>
 #include "../queue/redis_queue.h"
+#include "../db/postgres.h"
 
 
 struct Worker
@@ -16,8 +17,8 @@ struct Worker
     Worker();
     ~Worker();
     std::bool process(Job& job);
-    void handle_faliure(Job& job);
-    void run(R_queue& q);
+    void handle_faliure(Job& job, R_queue& q, DB& db);
+    void run();
 
 };
 #endif
