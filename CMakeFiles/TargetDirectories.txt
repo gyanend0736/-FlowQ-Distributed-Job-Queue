@@ -1,0 +1,3 @@
+/home/amour/flowQ/CMakeFiles/flowq_worker.dir
+/home/amour/flowQ/CMakeFiles/edit_cache.dir
+/home/amour/flowQ/CMakeFiles/rebuild_cache.dir

@@ -2,7 +2,7 @@
 #include<chrono>
 // #include "../common/Job.h"
 #include "redis_queue.h"
-
+// #include "../db/postgres.h";
 
 //constructor
 R_queue::R_queue(){
@@ -37,6 +37,7 @@ std:: string R_queue:: R_queue_push(Job job){
         redisReply *push_job= (redisReply*) redisCommand(c,"ZADD Job %f %s", score, job_id.c_str()); 
         redisReply *push_job_json= (redisReply*) redisCommand(c,"Set Job:%s %s", job_id.c_str(),job_json.c_str());
 
+        // DB::insert_job(job);
 
         std::string result_status;
         if (push_job->type == REDIS_REPLY_INTEGER) {

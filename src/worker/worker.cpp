@@ -25,14 +25,16 @@ Worker:: ~Worker(){
         redisFree(c);
     }
 }
-std::bool Worker::process(Job job){
+
+bool Worker::process(Job& job){
     std::cout << "Processing job: " << job.job_id << "\n";
     std::cout << "Type: " << job.type << "\n";
     std::cout << "Payload: " << job.payload.dump() << "\n"; 
-    std::cout<< "error: "<< job.error.dump()<<"\n";   
+    std::cout<< "error: "<< job.error.dump()<<"\n"; 
+    return true;  
 }
 
-void Worker::handle_faliure(Job& job, R_queue& q){
+void Worker::handle_faliure(Job& job, R_queue& q, DB& db){
        job.attempts+=1;
        job.next_retry_at= (job.next_retry_at==0)? 1: 2*job.next_retry_at;
        if(job.max_retries>job.attempts){
@@ -43,18 +45,27 @@ void Worker::handle_faliure(Job& job, R_queue& q){
             job.status= Status::DEAD;
             q.R_queue_dead(job.job_id);
             q.R_queue_delete(job.job_id);
-
+            db.insert_dead_job(job);
        }
 }
 
-void Worker::run(R_queue& q){
+void Worker::run(){
+    R_queue q;
+    DB db;
     while(true){
         auto job = q.R_queue_pop();
+
         if(job.has_value()){
-            bool Sucsses= process(job.value());
+            Job j = job.value(); 
+            db.insert_job(j);
+            bool Sucsses= process(j);
             if(!Sucsses){
-                job.status=Status::FAILED;
-                handle_faliure(job.value(), q);
+                j.status=Status::FAILED;
+                handle_faliure(j, q,db);
+            }
+            else{
+                j.status= Status::DONE;
+                db.update_job(j);
             }
             
         }
@@ -68,9 +79,8 @@ void Worker::run(R_queue& q){
 
 int main(){
     Worker a;
-    R_queue q;
     a.workerId= 248783434ULL;
     a.status= Status::PENDING;
-    a.run(q);
+    a.run();
 
 }

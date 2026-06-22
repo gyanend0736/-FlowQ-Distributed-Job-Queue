@@ -3,6 +3,8 @@
 #include "../common/Job.h"
 #include<hiredis/hiredis.h>
 #include<chrono>
+// #include "../db/postgres.h";
+
 
 class R_queue{
 public:
@@ -77,7 +79,7 @@ public:
         redisReply *push_job= (redisReply*) redisCommand(c,"ZADD Job %f %s", score, job_id.c_str()); 
         redisReply *push_job_json= (redisReply*) redisCommand(c,"Set Job:%s %s", job_id.c_str(),job_json.c_str());
 
-
+        // DB::insert_job(job);
         std::string result_status;
         if (push_job->type == REDIS_REPLY_INTEGER) {
             // ZADD returns an integer (1 if added, 0 if already existed/updated)

@@ -1,5 +1,5 @@
-CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o: \
- /home/amour/flowQ/src/worker/worker.cpp /usr/include/stdc-predef.h \
+CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.o: \
+ /home/amour/flowQ/src/queue/redis_queue.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/13/iostream /usr/include/c++/13/bits/requires_hosted.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \
@@ -148,18 +148,21 @@ CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o: \
  /usr/include/c++/13/bits/locale_facets.tcc \
  /usr/include/c++/13/bits/basic_ios.tcc \
  /usr/include/c++/13/bits/ostream.tcc /usr/include/c++/13/istream \
- /usr/include/c++/13/bits/istream.tcc \
- /home/amour/flowQ/src/worker/Worker.h /usr/include/hiredis/hiredis.h \
- /usr/include/hiredis/read.h /usr/include/x86_64-linux-gnu/sys/time.h \
+ /usr/include/c++/13/bits/istream.tcc /usr/include/c++/13/chrono \
+ /usr/include/c++/13/bits/chrono.h /usr/include/c++/13/ratio \
+ /usr/include/c++/13/cstdint \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h /usr/include/stdint.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
+ /usr/include/c++/13/limits /usr/include/c++/13/ctime \
+ /usr/include/c++/13/bits/parse_numbers.h \
+ /home/amour/flowQ/src/queue/redis_queue.h /usr/include/hiredis/hiredis.h \
+ /usr/include/hiredis/read.h /usr/include/x86_64-linux-gnu/sys/time.h \
  /usr/include/hiredis/sds.h /usr/include/hiredis/alloc.h \
- /home/amour/flowQ/src/worker/../queue/redis_queue.h \
- /home/amour/flowQ/src/worker/../queue/../common/Job.h \
- /home/amour/flowQ/src/worker/../queue/../common/Types.h \
- /usr/include/c++/13/cstdint /usr/include/nlohmann/json.hpp \
- /usr/include/c++/13/algorithm /usr/include/c++/13/bits/stl_algo.h \
+ /home/amour/flowQ/src/queue/../common/Job.h \
+ /home/amour/flowQ/src/queue/../common/Types.h \
+ /usr/include/nlohmann/json.hpp /usr/include/c++/13/algorithm \
+ /usr/include/c++/13/bits/stl_algo.h \
  /usr/include/c++/13/bits/algorithmfwd.h \
  /usr/include/c++/13/bits/stl_heap.h \
  /usr/include/c++/13/bits/uniform_int_dist.h \
@@ -210,8 +213,7 @@ CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
- /usr/include/c++/13/bits/specfun.h /usr/include/c++/13/limits \
- /usr/include/c++/13/tr1/gamma.tcc \
+ /usr/include/c++/13/bits/specfun.h /usr/include/c++/13/tr1/gamma.tcc \
  /usr/include/c++/13/tr1/special_function_util.h \
  /usr/include/c++/13/tr1/bessel_function.tcc \
  /usr/include/c++/13/tr1/beta_function.tcc \
@@ -252,8 +254,6 @@ CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o: \
  /usr/include/nlohmann/detail/meta/identity_tag.hpp \
  /usr/include/nlohmann/detail/meta/std_fs.hpp \
  /usr/include/c++/13/filesystem /usr/include/c++/13/bits/fs_fwd.h \
- /usr/include/c++/13/bits/chrono.h /usr/include/c++/13/ratio \
- /usr/include/c++/13/ctime /usr/include/c++/13/bits/parse_numbers.h \
  /usr/include/c++/13/bits/fs_path.h /usr/include/c++/13/locale \
  /usr/include/c++/13/bits/locale_facets_nonio.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/time_members.h \
@@ -290,11 +290,4 @@ CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o: \
  /usr/include/nlohmann/ordered_map.hpp /usr/include/c++/13/any \
  /usr/include/nlohmann/detail/macro_unscope.hpp \
  /usr/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
- /usr/include/c++/13/chrono /usr/include/c++/13/optional \
- /home/amour/flowQ/src/worker/../db/postgres.h \
- /usr/include/postgresql/libpq-fe.h \
- /usr/include/postgresql/postgres_ext.h \
- /usr/include/postgresql/pg_config_ext.h \
- /home/amour/flowQ/src/worker/../db/../common/Job.h \
- /usr/include/c++/13/thread /usr/include/c++/13/bits/std_thread.h \
- /usr/include/c++/13/bits/this_thread_sleep.h
+ /usr/include/c++/13/optional

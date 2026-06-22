@@ -56,7 +56,7 @@ EQUALS = =
 CMAKE_SOURCE_DIR = /home/amour/flowQ
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/amour/flowQ/build
+CMAKE_BINARY_DIR = /home/amour/flowQ
 
 # Include any dependencies generated for this target.
 include CMakeFiles/flowq_worker.dir/depend.make
@@ -70,9 +70,9 @@ include CMakeFiles/flowq_worker.dir/progress.make
 include CMakeFiles/flowq_worker.dir/flags.make
 
 CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.o: CMakeFiles/flowq_worker.dir/flags.make
-CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.o: /home/amour/flowQ/src/queue/redis_queue.cpp
+CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.o: src/queue/redis_queue.cpp
 CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.o: CMakeFiles/flowq_worker.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/amour/flowQ/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/amour/flowQ/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.o -MF CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.o.d -o CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.o -c /home/amour/flowQ/src/queue/redis_queue.cpp
 
 CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.i: cmake_force
@@ -84,9 +84,9 @@ CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.s: cmake_force
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/amour/flowQ/src/queue/redis_queue.cpp -o CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.s
 
 CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o: CMakeFiles/flowq_worker.dir/flags.make
-CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o: /home/amour/flowQ/src/worker/worker.cpp
+CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o: src/worker/worker.cpp
 CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o: CMakeFiles/flowq_worker.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/amour/flowQ/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/amour/flowQ/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o -MF CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o.d -o CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o -c /home/amour/flowQ/src/worker/worker.cpp
 
 CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.i: cmake_force
@@ -98,9 +98,9 @@ CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.s: cmake_force
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/amour/flowQ/src/worker/worker.cpp -o CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.s
 
 CMakeFiles/flowq_worker.dir/src/db/postgres.cpp.o: CMakeFiles/flowq_worker.dir/flags.make
-CMakeFiles/flowq_worker.dir/src/db/postgres.cpp.o: /home/amour/flowQ/src/db/postgres.cpp
+CMakeFiles/flowq_worker.dir/src/db/postgres.cpp.o: src/db/postgres.cpp
 CMakeFiles/flowq_worker.dir/src/db/postgres.cpp.o: CMakeFiles/flowq_worker.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/amour/flowQ/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/flowq_worker.dir/src/db/postgres.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/amour/flowQ/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/flowq_worker.dir/src/db/postgres.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/flowq_worker.dir/src/db/postgres.cpp.o -MF CMakeFiles/flowq_worker.dir/src/db/postgres.cpp.o.d -o CMakeFiles/flowq_worker.dir/src/db/postgres.cpp.o -c /home/amour/flowQ/src/db/postgres.cpp
 
 CMakeFiles/flowq_worker.dir/src/db/postgres.cpp.i: cmake_force
@@ -125,7 +125,7 @@ flowq_worker: CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o
 flowq_worker: CMakeFiles/flowq_worker.dir/src/db/postgres.cpp.o
 flowq_worker: CMakeFiles/flowq_worker.dir/build.make
 flowq_worker: CMakeFiles/flowq_worker.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/amour/flowQ/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable flowq_worker"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/amour/flowQ/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable flowq_worker"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/flowq_worker.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -137,6 +137,6 @@ CMakeFiles/flowq_worker.dir/clean:
 .PHONY : CMakeFiles/flowq_worker.dir/clean
 
 CMakeFiles/flowq_worker.dir/depend:
-	cd /home/amour/flowQ/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/amour/flowQ /home/amour/flowQ /home/amour/flowQ/build /home/amour/flowQ/build /home/amour/flowQ/build/CMakeFiles/flowq_worker.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /home/amour/flowQ && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/amour/flowQ /home/amour/flowQ /home/amour/flowQ /home/amour/flowQ /home/amour/flowQ/CMakeFiles/flowq_worker.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/flowq_worker.dir/depend
 

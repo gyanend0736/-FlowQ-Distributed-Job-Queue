@@ -16,7 +16,7 @@ struct Worker
     JobId current_jobId;
     Worker();
     ~Worker();
-    std::bool process(Job& job);
+    bool process(Job& job);
     void handle_faliure(Job& job, R_queue& q, DB& db);
     void run();
 

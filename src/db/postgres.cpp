@@ -101,32 +101,32 @@ void DB::update_job(Job job){
     PQclear(res); // add this after the error checks
 }
 
-int main(){
-    DB db;
+// int main(){
+//     DB db;
 
-    // 1. Insert a job
-    Job job;
-    job.job_id = 22222222ULL;
-    job.idempotent_key = "test_update_001";
-    job.type = "process_payment";
-    job.payload = {{"amount", 5000}, {"currency", "INR"}};
-    job.priority = 1;
-    job.status = Status::PENDING;
-    job.attempts = 0;
-    job.max_retries = 3;
-    job.result = {};
-    job.error = {};
+//     // 1. Insert a job
+//     Job job;
+//     job.job_id = 22222222ULL;
+//     job.idempotent_key = "test_update_001";
+//     job.type = "process_payment";
+//     job.payload = {{"amount", 5000}, {"currency", "INR"}};
+//     job.priority = 1;
+//     job.status = Status::PENDING;
+//     job.attempts = 0;
+//     job.max_retries = 3;
+//     job.result = {};
+//     job.error = {};
 
-    db.insert_job(job);
-    std::cout << "Job inserted\n";
+//     db.insert_job(job);
+//     std::cout << "Job inserted\n";
 
-    // 2. Simulate job completing — update it
-    job.attempts = 1;
-    job.status = Status::DONE;
-    job.result = {{"transaction_id", "txn_abc123"}, {"message", "payment success"}};
+//     // 2. Simulate job completing — update it
+//     job.attempts = 1;
+//     job.status = Status::DONE;
+//     job.result = {{"transaction_id", "txn_abc123"}, {"message", "payment success"}};
 
-    db.update_job(job);
-    std::cout << "Job updated\n";
+//     db.update_job(job);
+//     std::cout << "Job updated\n";
 
-    return 0;
-}
+//     return 0;
+// }
