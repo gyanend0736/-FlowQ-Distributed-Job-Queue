@@ -31,7 +31,7 @@ bool Worker::process(Job& job){
     std::cout << "Type: " << job.type << "\n";
     std::cout << "Payload: " << job.payload.dump() << "\n"; 
     std::cout<< "error: "<< job.error.dump()<<"\n"; 
-    return true;  
+    return false;  
 }
 
 void Worker::handle_faliure(Job& job, R_queue& q, DB& db){
@@ -57,7 +57,7 @@ void Worker::run(){
 
         if(job.has_value()){
             Job j = job.value(); 
-            db.insert_job(j);
+            // db.insert_job(j);
             bool Sucsses= process(j);
             if(!Sucsses){
                 j.status=Status::FAILED;

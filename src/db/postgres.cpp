@@ -57,14 +57,14 @@ void DB::insert_dead_job(Job job){
         job.type.c_str(),
         s_payload.c_str(),
         s_priority.c_str(),
-        s_status.c_str(),
+        
         s_attempts.c_str(),
-        s_max_retries.c_str()
+        
     };
     PGresult* res=PQexecParams(conn,
-        "INSERT INTO dead_letter_queue (job_id,idempotent_key, type, payload,priority, status, attempts, max_retries) "
-        "VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-        8,
+        "INSERT INTO dead_letter_queue (job_id,idempotent_key, type, payload,priority, attempts) "
+        "VALUES ($1, $2, $3, $4, $5, $6)",
+        6,
         NULL,
         values,
         NULL,
