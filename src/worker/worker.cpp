@@ -31,7 +31,7 @@ bool Worker::process(Job& job){
     std::cout << "Type: " << job.type << "\n";
     std::cout << "Payload: " << job.payload.dump() << "\n"; 
     std::cout<< "error: "<< job.error.dump()<<"\n"; 
-    return false;  
+    return true;  
 }
 
 void Worker::handle_faliure(Job& job, R_queue& q, DB& db){
@@ -43,7 +43,7 @@ void Worker::handle_faliure(Job& job, R_queue& q, DB& db){
        }
        else{
             job.status= Status::DEAD;
-            q.R_queue_dead(job.job_id);
+            
             q.R_queue_delete(job.job_id);
             db.insert_dead_job(job);
        }
@@ -57,7 +57,11 @@ void Worker::run(){
 
         if(job.has_value()){
             Job j = job.value(); 
-            // db.insert_job(j);
+            bool locked= q.R_queue_lockJob(j.job_id, workerId);
+            if(!locked){
+                std::cout << "Job already locked, skipping\n";
+                continue;
+            }
             bool Sucsses= process(j);
             if(!Sucsses){
                 j.status=Status::FAILED;
@@ -67,7 +71,7 @@ void Worker::run(){
                 j.status= Status::DONE;
                 db.update_job(j);
             }
-            
+            q.R_queue_unlock(j.job_id);
         }
         else{
             cout<<"queue is empty"<< "\n";

@@ -115,11 +115,20 @@ void R_queue::R_queue_delete(JobId job_id){
 }
 
 
-void R_queue::R_queue_dead(JobId job_id){
+bool R_queue::R_queue_lockJob(JobId job_id, JobId worker_id){
     std::string job_id_str= std::to_string(job_id);
-    redisReply *dead_job_pull= (redisReply*)redisCommand(c,"GET Job:%s", job_id_str.c_str());
-    std::string job_json= dead_job_pull->str;
-    redisReply *dead_job_push= (redisReply*)redisCommand(c, "SET Dead:%s %s" ,job_id_str.c_str(),job_json.c_str());
-    freeReplyObject(dead_job_pull);
-    freeReplyObject(dead_job_push);
+    std::string worker_id_str= std::to_string(worker_id);
+
+    redisReply* lock_job= (redisReply*)redisCommand(c,"Set lockJob:%s %s NX EX 30", job_id_str.c_str(),worker_id_str.c_str());
+    bool aquired= (lock_job->type== REDIS_REPLY_STATUS);
+    freeReplyObject(lock_job);
+    return aquired;
+}
+
+void R_queue::R_queue_unlock(JobId job_id){
+    std::string job_id_str= std::to_string(job_id);
+
+    redisReply* unlock= (redisReply*)redisCommand(c,"Del lockJob:%s", job_id_str.c_str());
+
+    freeReplyObject(unlock);
 }
