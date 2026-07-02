@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.o CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o CMakeFiles/flowq_worker.dir/src/db/postgres.cpp.o -o flowq_worker  -lhiredis -lpq 
+/usr/bin/c++ CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.o CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o CMakeFiles/flowq_worker.dir/src/worker/pool.cpp.o CMakeFiles/flowq_worker.dir/src/db/postgres.cpp.o -o flowq_worker  -lhiredis -lpq 

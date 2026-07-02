@@ -177,6 +177,30 @@ src/queue/redis_queue.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/flowq_worker.dir/build.make CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.s
 .PHONY : src/queue/redis_queue.cpp.s
 
+src/worker/pool.o: src/worker/pool.cpp.o
+.PHONY : src/worker/pool.o
+
+# target to build an object file
+src/worker/pool.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/flowq_worker.dir/build.make CMakeFiles/flowq_worker.dir/src/worker/pool.cpp.o
+.PHONY : src/worker/pool.cpp.o
+
+src/worker/pool.i: src/worker/pool.cpp.i
+.PHONY : src/worker/pool.i
+
+# target to preprocess a source file
+src/worker/pool.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/flowq_worker.dir/build.make CMakeFiles/flowq_worker.dir/src/worker/pool.cpp.i
+.PHONY : src/worker/pool.cpp.i
+
+src/worker/pool.s: src/worker/pool.cpp.s
+.PHONY : src/worker/pool.s
+
+# target to generate assembly for a file
+src/worker/pool.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/flowq_worker.dir/build.make CMakeFiles/flowq_worker.dir/src/worker/pool.cpp.s
+.PHONY : src/worker/pool.cpp.s
+
 src/worker/worker.o: src/worker/worker.cpp.o
 .PHONY : src/worker/worker.o
 
@@ -216,6 +240,9 @@ help:
 	@echo "... src/queue/redis_queue.o"
 	@echo "... src/queue/redis_queue.i"
 	@echo "... src/queue/redis_queue.s"
+	@echo "... src/worker/pool.o"
+	@echo "... src/worker/pool.i"
+	@echo "... src/worker/pool.s"
 	@echo "... src/worker/worker.o"
 	@echo "... src/worker/worker.i"
 	@echo "... src/worker/worker.s"

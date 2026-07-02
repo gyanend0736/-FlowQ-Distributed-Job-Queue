@@ -182,7 +182,7 @@ int main(){
     Job payoutJob; // Changed type to lowercase 'job' to match your header
 
   
-    payoutJob.job_id = 982231410293ULL;
+    payoutJob.job_id = 982231410203ULL;
     payoutJob.idempotent_key = "tx_unq_908123a8f"; 
     payoutJob.type = "process_payment";
 
@@ -212,7 +212,7 @@ int main(){
     // 6. Post-execution Metadata placeholders
     payoutJob.result = {}; 
     payoutJob.error = {};  
-    for(int i=0;i<4;i++){
+    for(int i=0;i<10;i++){
         payoutJob.job_id++;
         redisQ.R_queue_push(payoutJob);
     }

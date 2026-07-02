@@ -1,7 +1,7 @@
 #include<iostream>
 #include "Worker.h"
 #include<thread>
-
+#include "heartbeat.cpp"
 
 using namespace std;
 
@@ -27,10 +27,11 @@ Worker:: ~Worker(){
 }
 
 bool Worker::process(Job& job){
+    Heartbeat hd(c, job.job_id);
+    hb.start();
     std::cout << "Processing job: " << job.job_id << "\n";
-    std::cout << "Type: " << job.type << "\n";
-    std::cout << "Payload: " << job.payload.dump() << "\n"; 
-    std::cout<< "error: "<< job.error.dump()<<"\n"; 
+    std::this_thread::sleep_for(std::chrono::seconds(40));
+    hb.stop();
     return true;  
 }
 
@@ -49,10 +50,10 @@ void Worker::handle_faliure(Job& job, R_queue& q, DB& db){
        }
 }
 
-void Worker::run(){
+void Worker::run(std::atomic<bool>& running){
     R_queue q;
     DB db;
-    while(true){
+    while(running){
         auto job = q.R_queue_pop();
 
         if(job.has_value()){
@@ -69,6 +70,7 @@ void Worker::run(){
             }
             else{
                 j.status= Status::DONE;
+                q.R_queue_delete(j.job_id);
                 db.update_job(j);
             }
             q.R_queue_unlock(j.job_id);
@@ -81,10 +83,3 @@ void Worker::run(){
     } 
 }
 
-int main(){
-    Worker a;
-    a.workerId= 248783434ULL;
-    a.status= Status::PENDING;
-    a.run();
-
-}

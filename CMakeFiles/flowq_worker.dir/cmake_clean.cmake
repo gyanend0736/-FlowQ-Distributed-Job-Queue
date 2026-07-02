@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/flowq_worker.dir/src/db/postgres.cpp.o.d"
   "CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.o"
   "CMakeFiles/flowq_worker.dir/src/queue/redis_queue.cpp.o.d"
+  "CMakeFiles/flowq_worker.dir/src/worker/pool.cpp.o"
+  "CMakeFiles/flowq_worker.dir/src/worker/pool.cpp.o.d"
   "CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o"
   "CMakeFiles/flowq_worker.dir/src/worker/worker.cpp.o.d"
   "flowq_worker"

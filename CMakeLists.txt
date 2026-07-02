@@ -11,6 +11,7 @@ pkg_check_modules(LIBPQ REQUIRED libpq)
 add_executable(flowq_worker
     src/queue/redis_queue.cpp
     src/worker/worker.cpp
+    src/worker/pool.cpp
     src/db/postgres.cpp
 )
 
