@@ -1,2 +1,16 @@
-/build,
-Makefile
+# Build output
+build/
+
+# Third party dependencies
+third_party/
+_deps/
+# Compiled binaries
+*.o
+*.a
+
+# VS Code settings
+.vscode/
+
+# CMake cache
+CMakeCache.txt
+CMakeFiles/

@@ -28,10 +28,10 @@ Worker:: ~Worker(){
 
 bool Worker::process(Job& job){
     Heartbeat hd(c, job.job_id);
-    hb.start();
+    hd.start();
     std::cout << "Processing job: " << job.job_id << "\n";
     std::this_thread::sleep_for(std::chrono::seconds(40));
-    hb.stop();
+    hd.stop();
     return true;  
 }
 

@@ -47,5 +47,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/flowq_worker.dir/DependInfo.cmake"
+  "CMakeFiles/flowq_pool.dir/DependInfo.cmake"
+  "CMakeFiles/flowq_api.dir/DependInfo.cmake"
   )

@@ -63,7 +63,8 @@ CMAKE_BINARY_DIR = /home/amour/flowQ
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/flowq_worker.dir/all
+all: CMakeFiles/flowq_pool.dir/all
+all: CMakeFiles/flowq_api.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -71,34 +72,61 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/flowq_worker.dir/clean
+clean: CMakeFiles/flowq_pool.dir/clean
+clean: CMakeFiles/flowq_api.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/flowq_worker.dir
+# Target rules for target CMakeFiles/flowq_pool.dir
 
 # All Build rule for target.
-CMakeFiles/flowq_worker.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/flowq_worker.dir/build.make CMakeFiles/flowq_worker.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/flowq_worker.dir/build.make CMakeFiles/flowq_worker.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/amour/flowQ/CMakeFiles --progress-num=1,2,3,4,5 "Built target flowq_worker"
-.PHONY : CMakeFiles/flowq_worker.dir/all
+CMakeFiles/flowq_pool.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/flowq_pool.dir/build.make CMakeFiles/flowq_pool.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/flowq_pool.dir/build.make CMakeFiles/flowq_pool.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/amour/flowQ/CMakeFiles --progress-num=5,6,7,8,9,10 "Built target flowq_pool"
+.PHONY : CMakeFiles/flowq_pool.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/flowq_worker.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/amour/flowQ/CMakeFiles 5
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/flowq_worker.dir/all
+CMakeFiles/flowq_pool.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/amour/flowQ/CMakeFiles 6
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/flowq_pool.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/amour/flowQ/CMakeFiles 0
-.PHONY : CMakeFiles/flowq_worker.dir/rule
+.PHONY : CMakeFiles/flowq_pool.dir/rule
 
 # Convenience name for target.
-flowq_worker: CMakeFiles/flowq_worker.dir/rule
-.PHONY : flowq_worker
+flowq_pool: CMakeFiles/flowq_pool.dir/rule
+.PHONY : flowq_pool
 
 # clean rule for target.
-CMakeFiles/flowq_worker.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/flowq_worker.dir/build.make CMakeFiles/flowq_worker.dir/clean
-.PHONY : CMakeFiles/flowq_worker.dir/clean
+CMakeFiles/flowq_pool.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/flowq_pool.dir/build.make CMakeFiles/flowq_pool.dir/clean
+.PHONY : CMakeFiles/flowq_pool.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/flowq_api.dir
+
+# All Build rule for target.
+CMakeFiles/flowq_api.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/flowq_api.dir/build.make CMakeFiles/flowq_api.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/flowq_api.dir/build.make CMakeFiles/flowq_api.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/amour/flowQ/CMakeFiles --progress-num=1,2,3,4 "Built target flowq_api"
+.PHONY : CMakeFiles/flowq_api.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/flowq_api.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/amour/flowQ/CMakeFiles 4
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/flowq_api.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/amour/flowQ/CMakeFiles 0
+.PHONY : CMakeFiles/flowq_api.dir/rule
+
+# Convenience name for target.
+flowq_api: CMakeFiles/flowq_api.dir/rule
+.PHONY : flowq_api
+
+# clean rule for target.
+CMakeFiles/flowq_api.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/flowq_api.dir/build.make CMakeFiles/flowq_api.dir/clean
+.PHONY : CMakeFiles/flowq_api.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

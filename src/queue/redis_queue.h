@@ -2,9 +2,9 @@
 #define R_QUEUE_H
 #include<hiredis/hiredis.h>
 #include "../common/Job.h"
-
 #include<string>
 #include <optional>
+
 struct R_queue{
 public:
 
