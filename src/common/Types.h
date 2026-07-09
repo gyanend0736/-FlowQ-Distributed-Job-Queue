@@ -11,7 +11,7 @@
 using JobId= uint64_t;
 using json= nlohmann:: json;
 using Priority= uint8_t;
-using WaitTime= uint64_t;
+
 
 using Time= std::chrono::system_clock::time_point;
 enum class Status{
