@@ -13,7 +13,7 @@ public:
     void insert_job(Job job);
     void update_job(Job job);
     void insert_dead_job(Job job);
-
+    std::string get_status(JobId job_id);
 };
 
 

@@ -16,6 +16,7 @@ public:
     void R_queue_delete(JobId job_id);
     bool R_queue_lockJob(JobId job_id, JobId worker_id);
     void R_queue_unlock(JobId job_id);
+    JobId genrate_id();
 };
 
 

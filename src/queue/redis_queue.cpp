@@ -114,6 +114,12 @@ void R_queue::R_queue_delete(JobId job_id){
     freeReplyObject(delete_job);
 }
 
+JobId R_queue::genrate_id(){
+    redisReply* r= (redisReply*)redisCommand(c, "Incr job:counter");
+    JobId id= r->integer;
+    freeReplyObject(r);
+    return id;
+}
 
 bool R_queue::R_queue_lockJob(JobId job_id, JobId worker_id){
     std::string job_id_str= std::to_string(job_id);
