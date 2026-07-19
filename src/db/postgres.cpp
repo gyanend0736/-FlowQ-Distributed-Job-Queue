@@ -79,7 +79,7 @@ void DB::insert_dead_job(Job job){
 }
 
 void DB::update_job(Job job){
-    std::string s_status= "pending";
+    std::string s_status= "done";
     std::string s_attempts= std::to_string(job.attempts);
     std::string s_job_id= std::to_string(job.job_id);
     std::string s_result = job.result.dump();
@@ -105,19 +105,38 @@ void DB::update_job(Job job){
 std::string DB::get_status(JobId job_id){
     std::string job_id_str= std::to_string(job_id);
     const char* values[]= {
-       
         job_id_str.c_str()
     };
-    PGresult *res= PQexecParam(conn,
-        "Select status from jobs where job_id==$1",
+    PGresult *res= PQexecParams(conn,
+        "Select job_id, status, attempts, result, completed_at from jobs where job_id=$1",
         1,
-        NULL;
-        [job_id_str.c_str()],
-        NULL;
-        NULL;
+        NULL,
+        values,
+        NULL,
+        NULL,
         0
     );
+     if(PQresultStatus(res) != PGRES_TUPLES_OK){
+        std::cerr << PQerrorMessage(conn) << "\n";
+        PQclear(res);
+        return "";
+    }
 
-    return res->status->str;
+    if(PQntuples(res) == 0){
+        PQclear(res);
+        return "";  // job not found
+    }
+    std::string response= "{";
+    response+= "\"job_id\":" + std::string(PQgetvalue(res,0,0))+",";
+    response+= "\"status\":\"" + std::string(PQgetvalue(res,0,1))+"\",";
+    response+= "\"attempts\":" + std::string(PQgetvalue(res,0,2))+",";
+    response+= "\"result\":" + std::string(PQgetvalue(res,0,3))+",";
+    response+= "\"completed_at\":\"" + std::string(PQgetvalue(res,0,4))+"\"";
+    response+= "}";
+
+
+    
+    PQclear(res);
+    return response;
 }
 

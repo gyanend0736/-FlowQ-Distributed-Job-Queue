@@ -1,7 +1,7 @@
 #include<iostream>
 #include "Worker.h"
 #include<thread>
-#include "heartbeat.cpp"
+#include "heartbeat.h"
 
 using namespace std;
 
@@ -63,6 +63,8 @@ void Worker::run(std::atomic<bool>& running){
                 std::cout << "Job already locked, skipping\n";
                 continue;
             }
+            j.status= Status::PROCESSING;
+            q.R_queue_update(j);
             bool Sucsses= process(j);
             if(!Sucsses){
                 j.status=Status::FAILED;

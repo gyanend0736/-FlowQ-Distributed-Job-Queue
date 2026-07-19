@@ -33,6 +33,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(Status, {
     {Status::DEAD, "dead"},
 })
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Job, job_id, client_id, idempotent_key, type, payload,
-    priority, run_at, status, attempts, max_retries, next_retry_at)
+    priority, status, attempts, max_retries, next_retry_at)
 
 #endif

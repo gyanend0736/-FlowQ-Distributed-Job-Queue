@@ -27,17 +27,14 @@ R_queue:: ~R_queue(){
 // push for queue
 std:: string R_queue:: R_queue_push(Job job){
         std::string job_id= std::to_string(job.job_id);
-        std::string job_json= json(job).dump();
-
+        
         auto now= std::chrono::system_clock::now();
         auto ms= std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
         auto delay_ms= job.next_retry_at*1000;
         double score= (double)job.priority * 1e12 + ms+ delay_ms;
 
         redisReply *push_job= (redisReply*) redisCommand(c,"ZADD Job %f %s", score, job_id.c_str()); 
-        redisReply *push_job_json= (redisReply*) redisCommand(c,"Set Job:%s %s", job_id.c_str(),job_json.c_str());
-
-        // DB::insert_job(job);
+        R_queue_update(job);
 
         std::string result_status;
         if (push_job->type == REDIS_REPLY_INTEGER) {
@@ -55,6 +52,14 @@ std:: string R_queue:: R_queue_push(Job job){
         freeReplyObject(push_job); 
         
         return result_status;
+}
+
+// update status in the queue record
+void R_queue::R_queue_update(Job job){
+    std::string job_id= std::to_string(job.job_id);
+    std::string job_json= json(job).dump();
+    redisReply *push_job_json= (redisReply*) redisCommand(c,"Set Job:%s %s", job_id.c_str(),job_json.c_str());
+    freeReplyObject(push_job_json);  
 }
 
 // pop from queue
@@ -107,13 +112,28 @@ std::optional<Job> R_queue::R_queue_pop(){
         
 }
 
-
+// delete queue record
 void R_queue::R_queue_delete(JobId job_id){
     std::string job_id_str= std::to_string(job_id);
     redisReply *delete_job= (redisReply*)redisCommand(c,"DEL Job:%s", job_id_str.c_str());
     freeReplyObject(delete_job);
 }
 
+// fetch status from queue record
+std::string R_queue::get_status(JobId job_id){
+    std::string job_id_str=std::to_string(job_id);
+    redisReply *get_status= (redisReply*)redisCommand(c, "GET Job:%s", job_id_str.c_str());
+    if(get_status == nullptr || get_status->type == REDIS_REPLY_NIL){
+        freeReplyObject(get_status);
+        return "";  // empty = not in Redis, check Postgres
+    }
+    json j= json::parse(get_status->str);
+    
+    freeReplyObject(get_status);
+    return j["status"];
+}
+
+// genrate id for new job
 JobId R_queue::genrate_id(){
     redisReply* r= (redisReply*)redisCommand(c, "Incr job:counter");
     JobId id= r->integer;
@@ -121,6 +141,7 @@ JobId R_queue::genrate_id(){
     return id;
 }
 
+// lock job with worker 
 bool R_queue::R_queue_lockJob(JobId job_id, JobId worker_id){
     std::string job_id_str= std::to_string(job_id);
     std::string worker_id_str= std::to_string(worker_id);
@@ -131,6 +152,7 @@ bool R_queue::R_queue_lockJob(JobId job_id, JobId worker_id){
     return aquired;
 }
 
+// unlock job 
 void R_queue::R_queue_unlock(JobId job_id){
     std::string job_id_str= std::to_string(job_id);
 
