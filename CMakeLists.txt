@@ -37,3 +37,16 @@ target_link_libraries(flowq_api
     ${LIBPQ_LIBRARIES}
     pthread
 )
+
+add_executable(flowq_Scheduler
+        src/Scheduler/Scheduler.cpp
+        src/queue/redis_queue.cpp
+)
+target_include_directories(flowq_Scheduler PRIVATE
+    ${HIREDIS_INCLUDE_DIRS}
+    
+)
+target_link_libraries(flowq_Scheduler
+    ${HIREDIS_LIBRARIES}
+    
+)

@@ -27,11 +27,16 @@ R_queue:: ~R_queue(){
 // push for queue
 std:: string R_queue:: R_queue_push(Job job){
         std::string job_id= std::to_string(job.job_id);
-        
         auto now= std::chrono::system_clock::now();
         auto ms= std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-        auto delay_ms= job.next_retry_at*1000;
-        double score= (double)job.priority * 1e12 + ms+ delay_ms;
+        uint64_t wake_at_ms=0;
+        if (job.run_at > ms) {
+        wake_at_ms = job.run_at;
+    } else if (job.next_retry_at > 0) {
+        wake_at_ms = ms + (uint64_t)job.next_retry_at * 1000;
+    }
+        
+        double score= (double)job.priority * 1e12 + ms;
 
         redisReply *push_job= (redisReply*) redisCommand(c,"ZADD Job %f %s", score, job_id.c_str()); 
         R_queue_update(job);
