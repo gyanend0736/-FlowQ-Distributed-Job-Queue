@@ -3,6 +3,8 @@
 #include "../db/postgres.h"
 #include "../common/Job.h"
 #include "nlohmann/json.hpp"
+#include "../common/Priority.h"
+
 using json= nlohmann::json;
 int main(){
     crow::SimpleApp app;
@@ -21,7 +23,10 @@ int main(){
         job.max_retries=5;
         job.status= Status::PENDING;
         job.payload= nlohmann::json::parse(body["payload"].dump());
-        
+        job.priority= (body.has("priority"))? priority_from_string(body["priority"]) : 3;
+        job.run_at= (body.has("run_at"))? body["run_at"] : 0;
+        job.idempotent_key= (body.has("idempotent_key"))? body["idempotent_key"].s() : "";
+        job.created_at= now();
         queu.R_queue_push(job);
         db.insert_job(job);
 

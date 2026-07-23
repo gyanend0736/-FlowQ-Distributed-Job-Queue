@@ -20,8 +20,8 @@ struct Job
     int attempts;
     int max_retries;
     int next_retry_at;
-    Time created_at;
-    Time started_at;
+    uint64_t created_at;
+    uint64_t started_at;
     Time completed_at;
     json result;
     json error;   
@@ -34,6 +34,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(Status, {
     {Status::DEAD, "dead"},
 })
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Job, job_id, client_id, idempotent_key, type, payload,
-    priority, status, run_at, attempts, max_retries, next_retry_at)
+    priority, status, run_at, attempts, max_retries, next_retry_at, created_at , started_at)
 
 #endif

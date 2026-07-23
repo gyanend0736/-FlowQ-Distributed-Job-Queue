@@ -7,7 +7,6 @@
 #include <condition_variable>
 #include <hiredis/hiredis.h>
 #include "../queue/redis_queue.h"
-#include "../db/postgres.h"
 
 class Scheduler {
 public:
@@ -16,6 +15,7 @@ public:
     std::condition_variable cv;
     std::mutex mtx;
     std::thread sched_thread;
+    R_queue q;
 
     Scheduler();
     ~Scheduler();

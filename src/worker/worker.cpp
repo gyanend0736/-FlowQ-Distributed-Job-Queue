@@ -63,6 +63,9 @@ void Worker::run(std::atomic<bool>& running){
                 std::cout << "Job already locked, skipping\n";
                 continue;
             }
+            if(j.attempts==0){
+                j.started_at= now();
+            }
             j.status= Status::PROCESSING;
             q.R_queue_update(j);
             bool Sucsses= process(j);
