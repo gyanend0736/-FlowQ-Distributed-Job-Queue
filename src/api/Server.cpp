@@ -17,7 +17,7 @@ int main(){
 
         Job job;
         job.job_id= queu.genrate_id();
-        job.client_id= body["client_id"].s();
+        // job.client_id= body["client_id"].s();
         job.type= body["type"].s();
         job.attempts=0;
         job.max_retries=5;
@@ -26,7 +26,6 @@ int main(){
         job.priority= (body.has("priority"))? priority_from_string(body["priority"]) : 3;
         job.run_at= (body.has("run_at"))? body["run_at"] : 0;
         job.idempotent_key= (body.has("idempotent_key"))? body["idempotent_key"].s() : "";
-        job.created_at= now();
         queu.R_queue_push(job);
         db.insert_job(job);
 

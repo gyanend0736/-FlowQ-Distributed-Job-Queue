@@ -1,7 +1,17 @@
 #include "postgres.h"
+#include <cstdlib>
 
 DB::DB(){
-    conn= PQconnectdb("host=127.0.0.1 port=5431 user=flowq password=gyanend0736 dbname=flowq");
+    std::string host = std::getenv("PG_host") ? std::getenv("PG_host") : "localhost";
+    std::string password = std::getenv("PG_password") ? std::getenv("PG_password") : "";
+    std::string user = std::getenv("PG_user") ? std::getenv("PG_user") : "";
+    std::string dbname = std::getenv("PG_dbname") ? std::getenv("PG_dbname") : "";
+    std::string port = std::getenv("PG_port") ? std::getenv("PG_port") : "5423";
+    conn= PQconnectdb("host="+host+
+         " port="+port+
+         " user="+ user+
+         " password="+password+
+         " dbname="+ dbname);
     if(PQstatus(conn) != CONNECTION_OK){
         printf("error in connecting db\n");
     }
@@ -48,9 +58,10 @@ void DB::insert_dead_job(Job job){
      std::string s_job_id= std::to_string(job.job_id);
     std::string s_payload= job.payload.dump();
     std::string s_priority= std::to_string(job.priority);
-    std::string s_status= "pending";
+    std::string s_status= "dead";
     std::string s_attempts= std::to_string(job.attempts);
     std::string s_max_retries= std::to_string(job.max_retries);
+
     const char* values[]= {
         s_job_id.c_str(),
         job.idempotent_key.c_str(),
@@ -83,15 +94,17 @@ void DB::update_job(Job job){
     std::string s_attempts= std::to_string(job.attempts);
     std::string s_job_id= std::to_string(job.job_id);
     std::string s_result = job.result.dump();
+    std::string s_started= std::to_string(job.started_at);
     const char* values[]= {
         s_status.c_str(),
         s_attempts.c_str(),
         s_result.c_str(),
+        s_started.c_str(),
         s_job_id.c_str()
     };
     PGresult *res= PQexecParams(conn,
-        "UPDATE jobs SET status=$1, attempts=$2, result=$3, completed_at=NOW() where job_id=$4",
-        4,
+        "UPDATE jobs SET status=$1, attempts=$2, result=$3, started_at=to_timestamp($4::bigint/1000.0),completed_at=NOW() where job_id=$5",
+        5,
         NULL,
         values,
         NULL,
@@ -101,14 +114,13 @@ void DB::update_job(Job job){
     PQclear(res); // add this after the error checks
 }
 
-
 std::string DB::get_status(JobId job_id){
     std::string job_id_str= std::to_string(job_id);
     const char* values[]= {
         job_id_str.c_str()
     };
     PGresult *res= PQexecParams(conn,
-        "Select job_id, status, attempts, result, completed_at from jobs where job_id=$1",
+        "Select job_id, status, attempts, result,created_at, started_at, completed_at from jobs where job_id=$1",
         1,
         NULL,
         values,
