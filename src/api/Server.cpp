@@ -21,11 +21,18 @@ int main(){
         job.type= body["type"].s();
         job.attempts=0;
         job.max_retries=5;
+        job.next_retry_at=0;
         job.status= Status::PENDING;
-        job.payload= nlohmann::json::parse(body["payload"].dump());
-        job.priority= (body.has("priority"))? priority_from_string(body["priority"]) : 3;
-        job.run_at= (body.has("run_at"))? body["run_at"] : 0;
-        job.idempotent_key= (body.has("idempotent_key"))? body["idempotent_key"].s() : "";
+        crow::json::wvalue wval(body["payload"]);
+        
+        job.payload= nlohmann::json::parse(wval.dump());
+        
+        job.priority= (body.has("priority"))? priority_from_string(body["priority"].s()) : 3;
+        
+        job.run_at= (body.has("run_at"))? body["run_at"].i() : 0;
+        
+        
+        // job.idempotent_key= (body.has("idempotent_key"))? body["idempotent_key"].s() : '';
         queu.R_queue_push(job);
         db.insert_job(job);
 

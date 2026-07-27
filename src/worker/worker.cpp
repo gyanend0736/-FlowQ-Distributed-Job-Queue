@@ -64,7 +64,9 @@ void Worker::run(std::atomic<bool>& running){
                 continue;
             }
             if(j.attempts==0){
-                j.started_at= now();
+                auto now= std::chrono::system_clock::now();
+                auto ms= std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+                j.started_at= ms;
             }
             j.status= Status::PROCESSING;
             q.R_queue_update(j);

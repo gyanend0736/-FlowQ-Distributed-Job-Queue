@@ -24,6 +24,7 @@ target_link_libraries(flowq_pool
 
 add_executable(flowq_api
     src/api/Server.cpp
+    src/common/Priority.cpp
     src/queue/redis_queue.cpp
     src/db/postgres.cpp
 )

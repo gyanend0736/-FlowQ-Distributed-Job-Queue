@@ -7,11 +7,11 @@ DB::DB(){
     std::string user = std::getenv("PG_user") ? std::getenv("PG_user") : "";
     std::string dbname = std::getenv("PG_dbname") ? std::getenv("PG_dbname") : "";
     std::string port = std::getenv("PG_port") ? std::getenv("PG_port") : "5423";
-    conn= PQconnectdb("host="+host+
+    conn= PQconnectdb(("host="+host+
          " port="+port+
          " user="+ user+
          " password="+password+
-         " dbname="+ dbname);
+         " dbname="+ dbname).c_str());
     if(PQstatus(conn) != CONNECTION_OK){
         printf("error in connecting db\n");
     }
