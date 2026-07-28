@@ -2,7 +2,7 @@
 #include "Worker.h"
 #include<thread>
 #include "heartbeat.h"
-
+#include <math.h>
 using namespace std;
 
 
@@ -30,14 +30,14 @@ bool Worker::process(Job& job){
     Heartbeat hd(c, job.job_id);
     hd.start();
     std::cout << "Processing job: " << job.job_id << "\n";
-    std::this_thread::sleep_for(std::chrono::seconds(40));
+    std::this_thread::sleep_for(std::chrono::seconds(20));
     hd.stop();
-    return true;  
+    return false;  
 }
 
 void Worker::handle_faliure(Job& job, R_queue& q, DB& db){
        job.attempts+=1;
-       job.next_retry_at= (job.next_retry_at==0)? 1: 2*job.next_retry_at;
+       job.next_retry_at= 1<< job.attempts;
        if(job.max_retries>job.attempts){
             job.status= Status::PENDING;
             q.R_queue_push(job);
