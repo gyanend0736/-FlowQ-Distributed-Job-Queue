@@ -33,8 +33,9 @@ int main(){
         
         
         // job.idempotent_key= (body.has("idempotent_key"))? body["idempotent_key"].s() : '';
-        queu.R_queue_push(job);
         db.insert_job(job);
+        queu.R_queue_push(job);
+        
 
         crow::json::wvalue res;
         res["job_id"]= job.job_id;

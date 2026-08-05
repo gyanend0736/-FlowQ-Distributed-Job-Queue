@@ -1,11 +1,20 @@
 cmake_minimum_required(VERSION 3.16)
 project(flowq)
 set(CMAKE_CXX_STANDARD 17)
+include(FetchContent)
 
+enable_testing()
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(HIREDIS REQUIRED hiredis)
 pkg_check_modules(LIBPQ REQUIRED libpq)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+FetchContent_MakeAvailable(googletest)
+enable_testing()
 
+# Coding executables
 add_executable(flowq_pool
     src/queue/redis_queue.cpp
     src/worker/worker.cpp
@@ -51,3 +60,6 @@ target_link_libraries(flowq_Scheduler
     ${HIREDIS_LIBRARIES}
     
 )
+
+
+# Testing Executables 

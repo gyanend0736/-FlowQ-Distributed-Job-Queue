@@ -30,9 +30,9 @@ bool Worker::process(Job& job){
     Heartbeat hd(c, job.job_id);
     hd.start();
     std::cout << "Processing job: " << job.job_id << "\n";
-    std::this_thread::sleep_for(std::chrono::seconds(20));
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
     hd.stop();
-    return false;  
+    return true;  
 }
 
 void Worker::handle_faliure(Job& job, R_queue& q, DB& db){
