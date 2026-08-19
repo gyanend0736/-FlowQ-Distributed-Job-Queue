@@ -21,15 +21,15 @@ class RedisConnectionPool{
         std::condition_variable cv;
 };
 
-class RedisConnGaurd{
+class RedisConnGuard{
     public:
-        RedisConnGaurd();
-        ~RedisConnGaurd();
+        RedisConnGuard(RedisConnectionPool& pool);
+        ~RedisConnGuard();
         redisContext* get();
     private:
         RedisConnectionPool& pool;
         redisContext* conn;
-}
+};
 
 
 
