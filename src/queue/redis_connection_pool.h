@@ -9,6 +9,7 @@
 
 class RedisConnectionPool{
     public:
+        RedisConnectionPool(){}
         RedisConnectionPool(const std::string& host, int port, size_t pool_size);
         ~RedisConnectionPool();
         redisContext* acquire();

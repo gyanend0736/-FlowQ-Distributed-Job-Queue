@@ -4,13 +4,25 @@
 #include "../common/Job.h"
 #include "nlohmann/json.hpp"
 #include "../common/Priority.h"
+#include "../queue/redis_connection_pool.h"
+
 
 using json= nlohmann::json;
 int main(){
     crow::SimpleApp app;
-    R_queue queu;
+    std::unique_ptr<RedisConnectionPool> redis_pool;
+    try
+    {
+        redis_pool= std::make_unique<RedisConnectionPool>("localhost", 6379, 12);
+    }
+    catch(const std::exception& e)
+    {
+         std::cerr << "FATAL: could not start flowq_api - " << e.what() << "\n";
+        return 1;
+    }
+    
+    R_queue queu(*redis_pool);
     DB db;
-
     CROW_ROUTE(app, "/jobs").methods("POST"_method)([&queu, &db](const crow::request& req){
         auto body= crow::json::load(req.body);
         if(!body){return crow::response(400, "invalid json");}

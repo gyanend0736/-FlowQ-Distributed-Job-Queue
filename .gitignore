@@ -7,6 +7,9 @@ _deps/
 # Compiled binaries
 *.o
 *.a
+flowq_api
+flowq_pool
+flowq_scheduler
 
 # VS Code settings
 .vscode/
@@ -16,3 +19,4 @@ CMakeCache.txt
 CMakeFiles/
 Makefile
 *.cmake
+

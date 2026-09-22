@@ -1,23 +1,8 @@
 #include "postgres.h"
 #include <cstdlib>
 
-DB::DB(){
-    std::string host = std::getenv("PG_host") ? std::getenv("PG_host") : "localhost";
-    std::string password = std::getenv("PG_password") ? std::getenv("PG_password") : "";
-    std::string user = std::getenv("PG_user") ? std::getenv("PG_user") : "";
-    std::string dbname = std::getenv("PG_dbname") ? std::getenv("PG_dbname") : "";
-    std::string port = std::getenv("PG_port") ? std::getenv("PG_port") : "5423";
-    conn= PQconnectdb(("host="+host+
-         " port="+port+
-         " user="+ user+
-         " password="+password+
-         " dbname="+ dbname).c_str());
-    if(PQstatus(conn) != CONNECTION_OK){
-        printf("error in connecting db\n");
-    }
-}
+
 DB::~DB(){
-    PQfinish(conn);
 }
 
 void DB::insert_job(Job job){
@@ -37,7 +22,9 @@ void DB::insert_job(Job job){
         s_attempts.c_str(),
         s_max_retries.c_str()
     };
-    PGresult* res=PQexecParams(conn,
+
+    PostgresConnGuard guard(pool);
+    PGresult* res=PQexecParams(guard.get(),
         "INSERT INTO jobs (job_id,idempotent_key, type, payload,priority, status, attempts, max_retries) "
         "VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
         8,
@@ -72,7 +59,9 @@ void DB::insert_dead_job(Job job){
         s_attempts.c_str(),
         
     };
-    PGresult* res=PQexecParams(conn,
+
+    PostgresConnGuard guard(pool);
+    PGresult* res=PQexecParams(guard.get(),
         "INSERT INTO dead_letter_queue (job_id,idempotent_key, type, payload,priority, attempts) "
         "VALUES ($1, $2, $3, $4, $5, $6)",
         6,
@@ -102,7 +91,9 @@ void DB::update_job(Job job){
         s_started.c_str(),
         s_job_id.c_str()
     };
-    PGresult *res= PQexecParams(conn,
+
+    PostgresConnGuard guard(pool);
+    PGresult *res= PQexecParams(guard.get(),
         "UPDATE jobs SET status=$1, attempts=$2, result=$3, started_at=to_timestamp($4::bigint/1000.0),completed_at=NOW() where job_id=$5",
         5,
         NULL,
@@ -119,7 +110,8 @@ std::string DB::get_status(JobId job_id){
     const char* values[]= {
         job_id_str.c_str()
     };
-    PGresult *res= PQexecParams(conn,
+    PostgresConnGuard guard(pool);
+    PGresult *res= PQexecParams(guard.get(),
         "Select job_id, status, attempts, result,created_at, started_at, completed_at from jobs where job_id=$1",
         1,
         NULL,

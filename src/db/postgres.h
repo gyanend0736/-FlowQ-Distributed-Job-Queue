@@ -1,14 +1,16 @@
-#ifndef POSTGRES_H
+`       `   ifndef POSTGRES_H
 #define POSTGRES_H
 #include<iostream>
 #include<string>
 #include <libpq-fe.h>
 #include "../common/Job.h"
+#include "postgres_connection_pool.h"
 
 struct DB{
 public:
     PGconn* conn;
-    DB();
+    PostgresConnectionPool& pool;
+    DB(PostgresConnectionPool& pool): pool(pool){};
     ~DB();
     void insert_job(Job job);
     void update_job(Job job);

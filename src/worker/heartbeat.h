@@ -8,10 +8,11 @@
 #include<condition_variable>
 #include<hiredis/hiredis.h>
 #include "../common/Job.h"
+#include "../queue/redis_connection_pool.h"
 
 class Heartbeat {
 public:
-    redisContext* c;
+    RedisConnectionPool& pool;
     JobId job_id;
     std::atomic<bool> running;
     std::condition_variable cv;
@@ -19,8 +20,8 @@ public:
     std::thread hb_thread;
 
     // constructor — just store what it needs, don't start yet
-    Heartbeat(redisContext* c, JobId job_id) 
-        : c(c), job_id(job_id), running(false) {}
+    Heartbeat(RedisConnectionPool& pool, JobId job_id) 
+        : pool(pool), job_id(job_id), running(false) {}
 
     // destructor — make sure thread is stopped cleanly
     ~Heartbeat(){

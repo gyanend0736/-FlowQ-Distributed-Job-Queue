@@ -11,7 +11,8 @@ void Heartbeat::start(){
             });
             if(!running) break;
                 std::string job_id_str= std::to_string(job_id);
-            redisReply *Heartbeat= (redisReply*) redisCommand(c, "Expire lockJob:%s 30", job_id_str.c_str());
+            RedisConnGuard guard(pool);
+            redisReply *Heartbeat= (redisReply*) redisCommand(guard.get(), "Expire lockJob:%s 30", job_id_str.c_str());
             freeReplyObject(Heartbeat);
         }
         

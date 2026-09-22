@@ -7,14 +7,16 @@
 #include "../queue/redis_queue.h"
 #include "../db/postgres.h"
 #include <atomic>
+#include "../queue/redis_connection_pool.h"
 
 struct Worker
 { 
-    redisContext *c;
+
+    RedisConnectionPool& pool;
     JobId workerId;
     Status status;
     JobId current_jobId;
-    Worker();
+    Worker(RedisConnectionPool& pool);
     ~Worker();
     bool process(Job& job);
     void handle_faliure(Job& job, R_queue& q, DB& db);

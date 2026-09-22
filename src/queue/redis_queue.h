@@ -4,13 +4,14 @@
 #include "../common/Job.h"
 #include<string>
 #include <optional>
+#include "redis_connection_pool.h"
 
 struct R_queue{
+    
 public:
-
-    redisContext *c;
-    R_queue();
-    ~R_queue();
+    RedisConnectionPool& pool;
+    R_queue(RedisConnectionPool& pool): pool(pool){};
+    ~R_queue(){};
     std::string R_queue_push(Job job);
     void R_queue_update(Job job);
     std::optional<Job> R_queue_pop();

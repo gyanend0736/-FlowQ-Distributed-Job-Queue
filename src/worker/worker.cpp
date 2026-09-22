@@ -7,27 +7,15 @@ using namespace std;
 
 
 //constructor
-Worker::Worker(){
-    c= redisConnect("127.0.0.1",6379);
-    if (c == NULL || c->err) {
-        if (c != NULL) {
-            printf("Error: %s\n", c->errstr);
-        } else {
-            printf("Can't allocate redis context\n");
-        }
-        exit(1);
-    }
+Worker::Worker(RedisConnectionPool& redis_pool, PostgresConnectionPool& postgres_pool):redis_pool(redis_pool), postgres_pool(postgres_pool){
 }
 
 //destructor
 Worker:: ~Worker(){
-    if(c!=NULL){
-        redisFree(c);
-    }
 }
 
 bool Worker::process(Job& job){
-    Heartbeat hd(c, job.job_id);
+    Heartbeat hd(pool, job.job_id);
     hd.start();
     std::cout << "Processing job: " << job.job_id << "\n";
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -51,7 +39,7 @@ void Worker::handle_faliure(Job& job, R_queue& q, DB& db){
 }
 
 void Worker::run(std::atomic<bool>& running){
-    R_queue q;
+    R_queue q(pool);
     DB db;
     while(running){
         auto job = q.R_queue_pop();
