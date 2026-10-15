@@ -1,7 +1,7 @@
 #include "pool_creator.h"
 #include <iostream>
 
-std::unique_ptr<RedisConnectionPool> create_redis_pool_or_die(string:: binary_name, string::host, int port, size_t pool_size){
+std::unique_ptr<RedisConnectionPool> create_redis_pool_or_die(std::string binary_name, std::string host, int port, size_t pool_size){
     try{
         return std::make_unique<RedisConnectionPool>(host, port, pool_size);
     }catch(const std::exception& e){
@@ -10,7 +10,7 @@ std::unique_ptr<RedisConnectionPool> create_redis_pool_or_die(string:: binary_na
     }
 }
 
-std::unique_ptr<PostgresConnectionPool> create_postgres_pool_or_die(string:: binary_name, size_t pool_size){
+std::unique_ptr<PostgresConnectionPool> create_postgres_pool_or_die(std::string binary_name, size_t pool_size){
     try{
         return std::make_unique<PostgresConnectionPool>(pool_size);
     }catch(const std::exception& e){

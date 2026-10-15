@@ -15,7 +15,7 @@ Worker:: ~Worker(){
 }
 
 bool Worker::process(Job& job){
-    Heartbeat hd(pool, job.job_id);
+    Heartbeat hd(redis_pool, job.job_id);
     hd.start();
     std::cout << "Processing job: " << job.job_id << "\n";
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -39,8 +39,10 @@ void Worker::handle_faliure(Job& job, R_queue& q, DB& db){
 }
 
 void Worker::run(std::atomic<bool>& running){
-    R_queue q(pool);
-    DB db;
+    R_queue q(redis_pool);
+    DB db(postgres_pool);
+     bool waiting_message_shown = false; 
+     
     while(running){
         auto job = q.R_queue_pop();
 
@@ -71,9 +73,17 @@ void Worker::run(std::atomic<bool>& running){
             q.R_queue_unlock(j.job_id);
         }
         else{
-            cout<<"queue is empty"<< "\n";
+            if(!waiting_message_shown){
+                std::cout << "Waiting for job";
+                std::cout.flush();
+                waiting_message_shown = true;
+            } else {
+                std::cout << ".";
+                std::cout.flush();
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+       
 
     } 
 }

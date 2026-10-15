@@ -43,15 +43,17 @@ add_executable(flowq_scheduler
         src/scheduler/Scheduler.cpp
         src/common/pool_creator.cpp
         src/queue/redis_connection_pool.cpp
+        src/db/postgres_connection_pool.cpp
         src/queue/redis_queue.cpp
 )
 target_include_directories(flowq_scheduler PRIVATE
     ${HIREDIS_INCLUDE_DIRS}
+    ${LIBPQ_INCLUDE_DIRS}
     
 )
 target_link_libraries(flowq_scheduler
     ${HIREDIS_LIBRARIES}
-    
+    ${LIBPQ_LIBRARIES}
 )
 
 

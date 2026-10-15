@@ -2,9 +2,9 @@
 #include "Worker.h"
 #include <thread>
 #include <vector>
-#include<atomic>
+#include <atomic>
 #include "../queue/redis_connection_pool.h"
-include "../db/postgres_connection_pool.h"
+#include "../db/postgres_connection_pool.h"
 
 class workerPool{
 public:

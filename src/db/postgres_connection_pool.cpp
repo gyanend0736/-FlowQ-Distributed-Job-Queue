@@ -1,4 +1,6 @@
 #include "postgres_connection_pool.h"
+#include <cstdlib>
+#include <iostream>
 
 std::string create_connection_string(){
     std::string host = std::getenv("PG_host") ? std::getenv("PG_host") : "localhost";
@@ -11,7 +13,7 @@ std::string create_connection_string(){
 }
 
 PostgresConnectionPool::PostgresConnectionPool(size_t pool_size){
-    int requested= pool_size;
+    size_t requested= pool_size;
     int attempts= 0;
     int maxattempts=20;
     std::string conn_details= create_connection_string();
@@ -22,7 +24,7 @@ PostgresConnectionPool::PostgresConnectionPool(size_t pool_size){
             PQfinish(conn);
             continue;
         }
-        printf("Connection found! Connection number: %d\n", requested-pool_size);
+        printf("Connection found! Connection number: %zu\n", requested-pool_size);
         available.push_back(conn);
         pool_size--;
     }

@@ -36,7 +36,7 @@ void DB::insert_job(Job job){
 
     );
     if(PQresultStatus(res) != PGRES_COMMAND_OK){
-        std::cerr << PQerrorMessage(conn) << "\n";
+        std::cerr << PQerrorMessage(guard.get()) << "\n";
     }
     PQclear(res);
 }
@@ -73,7 +73,7 @@ void DB::insert_dead_job(Job job){
 
     );
     if(PQresultStatus(res) != PGRES_COMMAND_OK){
-        std::cerr << PQerrorMessage(conn) << "\n";
+        std::cerr << PQerrorMessage(guard.get()) << "\n";
     }
     PQclear(res);
 }
@@ -121,7 +121,7 @@ std::string DB::get_status(JobId job_id){
         0
     );
      if(PQresultStatus(res) != PGRES_TUPLES_OK){
-        std::cerr << PQerrorMessage(conn) << "\n";
+        std::cerr << PQerrorMessage(guard.get()) << "\n";
         PQclear(res);
         return "";
     }

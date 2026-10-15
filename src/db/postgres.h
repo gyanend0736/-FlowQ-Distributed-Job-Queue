@@ -1,4 +1,4 @@
-`       `   ifndef POSTGRES_H
+#ifndef POSTGRES_H
 #define POSTGRES_H
 #include<iostream>
 #include<string>
@@ -8,7 +8,6 @@
 
 struct DB{
 public:
-    PGconn* conn;
     PostgresConnectionPool& pool;
     DB(PostgresConnectionPool& pool): pool(pool){};
     ~DB();

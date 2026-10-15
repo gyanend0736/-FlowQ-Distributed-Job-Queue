@@ -5,24 +5,20 @@
 #include "nlohmann/json.hpp"
 #include "../common/Priority.h"
 #include "../queue/redis_connection_pool.h"
+#include "../common/pool_creator.h"
 
 
 using json= nlohmann::json;
 int main(){
     crow::SimpleApp app;
-    std::unique_ptr<RedisConnectionPool> redis_pool;
-    try
-    {
-        redis_pool= std::make_unique<RedisConnectionPool>("localhost", 6379, 12);
-    }
-    catch(const std::exception& e)
-    {
-         std::cerr << "FATAL: could not start flowq_api - " << e.what() << "\n";
-        return 1;
-    }
-    
+
+    auto redis_pool= create_redis_pool_or_die("flowq_api", "localhost", 6379, 12);
+    auto postgres_pool= create_postgres_pool_or_die("flowq_api",12);
     R_queue queu(*redis_pool);
-    DB db;
+    DB db(*postgres_pool);
+
+// ------------------------------ Job Post request ----------------------------------------------
+
     CROW_ROUTE(app, "/jobs").methods("POST"_method)([&queu, &db](const crow::request& req){
         auto body= crow::json::load(req.body);
         if(!body){return crow::response(400, "invalid json");}
@@ -55,6 +51,8 @@ int main(){
         return crow::response(202, res);
     });
     
+// ------------------------------Job status request ----------------------------------------------
+
     CROW_ROUTE(app, "/jobs/<string>")([&queu, &db](std::string job_id_str){
         JobId job_id = std::stoull(job_id_str);
         std::string status= queu.get_status(job_id);
