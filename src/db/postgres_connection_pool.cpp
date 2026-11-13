@@ -21,6 +21,7 @@ PostgresConnectionPool::PostgresConnectionPool(size_t pool_size){
         PGconn* conn= PQconnectdb(conn_details.c_str());
         if(PQstatus(conn) != CONNECTION_OK){
             printf("error in connecting db\n");
+            attempts++;
             PQfinish(conn);
             continue;
         }

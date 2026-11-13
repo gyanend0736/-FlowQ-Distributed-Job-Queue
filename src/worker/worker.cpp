@@ -28,13 +28,13 @@ void Worker::handle_faliure(Job& job, R_queue& q, DB& db){
        job.next_retry_at= 1<< job.attempts;
        if(job.max_retries>job.attempts){
             job.status= Status::PENDING;
-            q.R_queue_push(job);
+            q.queue_push(job);
        }
        else{
             job.status= Status::DEAD;
-            
-            q.R_queue_delete(job.job_id);
             db.insert_dead_job(job);
+            q.queue_delete_records(job.job_id);
+            
        }
 }
 
@@ -44,11 +44,11 @@ void Worker::run(std::atomic<bool>& running){
      bool waiting_message_shown = false; 
      
     while(running){
-        auto job = q.R_queue_pop();
+        auto job = q.queue_pop_ready();
 
         if(job.has_value()){
             Job j = job.value(); 
-            bool locked= q.R_queue_lockJob(j.job_id, workerId);
+            bool locked= q.queue_lockJob(j.job_id, workerId);
             if(!locked){
                 std::cout << "Job already locked, skipping\n";
                 continue;
@@ -59,7 +59,7 @@ void Worker::run(std::atomic<bool>& running){
                 j.started_at= ms;
             }
             j.status= Status::PROCESSING;
-            q.R_queue_update(j);
+            q.queue_records_update(j);
             bool Sucsses= process(j);
             if(!Sucsses){
                 j.status=Status::FAILED;
@@ -67,10 +67,10 @@ void Worker::run(std::atomic<bool>& running){
             }
             else{
                 j.status= Status::DONE;
-                q.R_queue_delete(j.job_id);
+                q.queue_delete_records(j.job_id);
                 db.update_job(j);
             }
-            q.R_queue_unlock(j.job_id);
+            q.queue_unlock(j.job_id);
         }
         else{
             if(!waiting_message_shown){

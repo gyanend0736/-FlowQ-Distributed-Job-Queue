@@ -12,13 +12,25 @@ public:
     RedisConnectionPool& pool;
     R_queue(RedisConnectionPool& pool): pool(pool){};
     ~R_queue(){};
-    std::string R_queue_push(Job job);
-    void R_queue_update(Job job);
-    std::optional<Job> R_queue_pop();
-    void R_queue_delete(JobId job_id);
-    bool R_queue_lockJob(JobId job_id, JobId worker_id);
-    void R_queue_unlock(JobId job_id);
+
+    // functionality for ready queue
+    std::string queue_push(Job job);
+    std::optional<Job> queue_pop_ready();
+
+    // functionalities for job records
+    void queue_records_update(Job job);
+    void queue_delete_records(JobId job_id);
+    std::optional<Job> queue_get_JobRecords(std::string job_id);
     std::string get_status(JobId job_id);
+    
+    // functionalities for waiting jobs
+    std::vector<std::string> get_due_waitingJobs();
+    void delete_from_waitingJobs(std::string job_id);
+
+    // other functionalities
+    bool queue_lockJob(JobId job_id, JobId worker_id);
+    void queue_unlock(JobId job_id);
+    
     JobId genrate_id();
 };
 

@@ -3,30 +3,9 @@
 #include<thread>
 #include "redis_queue.h"
 #include "redis_connection_pool.h"
-// //constructor
-// R_queue::R_queue(){
-//     c= redisConnect("127.0.0.1",6379);
-//     if (c == NULL || c->err) {
-//         if (c != NULL) {
-//             printf("Error: %s\n", c->errstr);
-//         } else {
-//             printf("Can't allocate redis context\n");
-//         }
-//         exit(1);
-//     }
-// }
 
-
-
-// //destructor
-// R_queue:: ~R_queue(){
-//     if(c!=NULL){
-//         redisFree(c);
-//     }
-// }
-
-// push for queue
-std:: string R_queue:: R_queue_push(Job job){
+//1.1 push for queue
+std:: string R_queue:: queue_push(Job job){
         
         std::string job_id= std::to_string(job.job_id);
         auto now= std::chrono::system_clock::now();
@@ -40,7 +19,7 @@ std:: string R_queue:: R_queue_push(Job job){
             wake_at_ms = ms + (uint64_t)job.next_retry_at * 1000;
         }
 
-        R_queue_update(job);
+        queue_records_update(job);
         
         redisReply* reply;
         std::string result_status;
@@ -68,18 +47,9 @@ std:: string R_queue:: R_queue_push(Job job){
     return result_status;
 }
 
-// update status in the queue record
-void R_queue::R_queue_update(Job job){
-    RedisConnGuard guard(pool);
-    std::string job_id= std::to_string(job.job_id);
-    std::string job_json= json(job).dump();
-    redisReply *push_job_json= (redisReply*) redisCommand(guard.get(),"Set Job:%s %s", job_id.c_str(),job_json.c_str());
-    freeReplyObject(push_job_json);  
-}
-
-// pop from queue
-std::optional<Job> R_queue::R_queue_pop(){
-         RedisConnGuard guard(pool);
+//1.2 pop from ready queue
+std::optional<Job> R_queue::queue_pop_ready(){
+        RedisConnGuard guard(pool);
         Job result_job;
         redisReply *pop_job= (redisReply*)redisCommand(guard.get(), "ZMPOP 1 Ready_jobs MIN");
         if (pop_job == nullptr){
@@ -122,15 +92,50 @@ std::optional<Job> R_queue::R_queue_pop(){
         
 }
 
-// delete queue record
-void R_queue::R_queue_delete(JobId job_id){
+
+//2.1 update status in the queue record
+void R_queue::queue_records_update(Job job){
     RedisConnGuard guard(pool);
-    std::string job_id_str= std::to_string(job_id);
-    redisReply *delete_job= (redisReply*)redisCommand(guard.get(),"DEL Job:%s", job_id_str.c_str());
-    freeReplyObject(delete_job);
+    std::string job_id= std::to_string(job.job_id);
+    std::string job_json= json(job).dump();
+    redisReply *reply= (redisReply*) redisCommand(guard.get(),"Set Job:%s %s", job_id.c_str(),job_json.c_str());
+    if(reply == nullptr || reply->type == REDIS_REPLY_ERROR) {
+        std::cerr << "Error updating job record for Job ID: " << job_id << "\n";
+    }
+    freeReplyObject(reply);  
 }
 
-// fetch status from queue record
+//2.2 fetch job record from queue
+std::optional<Job> R_queue::queue_get_JobRecords(std::string job_id){
+    RedisConnGuard guard(pool);
+    
+    redisReply* reply= (redisReply*) redisCommand(guard.get(), "GET Job:%s", job_id.c_str());
+    if(reply == nullptr || reply->type== REDIS_REPLY_ERROR){
+        freeReplyObject(reply);
+        throw std::runtime_error("Error fetching job record for Job ID: " + job_id);        
+    }
+    if(reply->type== REDIS_REPLY_NIL){
+        freeReplyObject(reply);
+
+        return std::nullopt;
+    }
+    json j= json::parse(reply->str);
+    freeReplyObject(reply);
+    return j.get<Job>();
+}
+
+//2.3 delete queue record
+void R_queue::queue_delete_records(JobId job_id){
+    RedisConnGuard guard(pool);
+    std::string job_id_str= std::to_string(job_id);
+    redisReply *reply= (redisReply*)redisCommand(guard.get(),"DEL Job:%s", job_id_str.c_str());
+    if(reply == nullptr || reply->type == REDIS_REPLY_ERROR) {
+        std::cerr << "Error deleting job record for Job ID: " << job_id_str << "\n";
+    }
+    freeReplyObject(reply);
+}
+
+//2.4 fetch status from queue record
 std::string R_queue::get_status(JobId job_id){
     RedisConnGuard guard(pool);
     std::string job_id_str=std::to_string(job_id);
@@ -145,33 +150,74 @@ std::string R_queue::get_status(JobId job_id){
     return j["status"];
 }
 
-// genrate id for new job
+
+
+//3.1 get all the jobs from waiting_jobs whose run_at is less than current time
+std::vector<std::string> R_queue::get_due_waitingJobs(){  
+    RedisConnGuard guard(pool);
+    auto now= std::chrono::system_clock::now();
+    auto ms= std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    redisReply* reply= (redisReply*)redisCommand(guard.get(), "ZRANGEBYSCORE Waiting_jobs 0 %lld",ms);
+    if(reply == NULL || reply->type== REDIS_REPLY_ERROR){
+        freeReplyObject(reply);
+        throw std::runtime_error("Error fetching due waiting jobs from Redis");
+    }
+    if(reply->elements==0){
+        freeReplyObject(reply);
+        return {};
+    }
+    std::vector<std::string> due_jobs;
+    for(size_t i=0;i<reply->elements;i++){
+        due_jobs.push_back(reply->element[i]->str);
+
+    }
+    freeReplyObject(reply);
+    return due_jobs;
+}
+
+//3.2 delete from waiting_jobs
+void R_queue::delete_from_waitingJobs(std::string job_id){
+    RedisConnGuard guard(pool);
+    redisReply* reply= (redisReply*)redisCommand(guard.get(),"ZREM Waiting_jobs %s", job_id.c_str());
+    if(reply==NULL || reply->type== REDIS_REPLY_NIL){
+        std::cerr<<"Error deleting job from waiting_jobs: "<<job_id<<"\n";
+    }
+    freeReplyObject(reply);
+}
+
+
+//4.1 genrate id for new job
 JobId R_queue::genrate_id(){
     RedisConnGuard guard(pool);
-    redisReply* r= (redisReply*)redisCommand(guard.get(), "Incr job:counter");
-    JobId id= r->integer;
-    freeReplyObject(r);
+    redisReply* reply= (redisReply*)redisCommand(guard.get(), "Incr job:counter");
+    if(reply == nullptr || reply->type == REDIS_REPLY_ERROR) {
+        std::cerr << "Error generating new job ID\n";
+    }
+    JobId id= reply->integer;
+    freeReplyObject(reply);
     return id;
 }
 
-// lock job with worker 
-bool R_queue::R_queue_lockJob(JobId job_id, JobId worker_id){
+//4.2 lock job with worker 
+bool R_queue::queue_lockJob(JobId job_id, JobId worker_id){
     RedisConnGuard guard(pool);
     std::string job_id_str= std::to_string(job_id);
     std::string worker_id_str= std::to_string(worker_id);
 
-    redisReply* lock_job= (redisReply*)redisCommand(guard.get(),"Set lockJob:%s %s NX EX 30", job_id_str.c_str(),worker_id_str.c_str());
-    bool aquired= (lock_job->type== REDIS_REPLY_STATUS);
-    freeReplyObject(lock_job);
+    redisReply* reply= (redisReply*)redisCommand(guard.get(),"Set lockJob:%s %s NX EX 30", job_id_str.c_str(),worker_id_str.c_str());
+    bool aquired= (reply->type== REDIS_REPLY_STATUS);
+    freeReplyObject(reply);
     return aquired;
 }
 
-// unlock job 
-void R_queue::R_queue_unlock(JobId job_id){
+//4.3 unlock job 
+void R_queue::queue_unlock(JobId job_id){6
     RedisConnGuard guard(pool);
     std::string job_id_str= std::to_string(job_id);
 
-    redisReply* unlock= (redisReply*)redisCommand(guard.get(),"Del lockJob:%s", job_id_str.c_str());
-
-    freeReplyObject(unlock);
+    redisReply* reply= (redisReply*)redisCommand(guard.get(),"Del lockJob:%s", job_id_str.c_str());
+    if(reply == nullptr || reply->type == REDIS_REPLY_ERROR) {
+        std::cerr << "Error unlocking job for Job ID: " << job_id_str << "\n";
+    }
+    freeReplyObject(reply);
 }

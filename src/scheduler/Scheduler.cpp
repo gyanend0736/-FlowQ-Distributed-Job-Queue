@@ -29,31 +29,42 @@ void Scheduler::stop(){
 }
 
 
-void Scheduler::tick(){
-    auto now= std::chrono::system_clock::now();
-    auto ms= std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-    RedisConnGuard guard(*pool);
-    redisReply* due= (redisReply*)redisCommand(guard.get(), "ZRANGEBYSCORE Waiting_jobs 0 %llu",ms);
-    if(due == NULL || due->type== REDIS_REPLY_NIL || due->elements==0){
-        freeReplyObject(due);
-        return;
-    }
-    for(size_t i=0;i<due->elements;i++){
-        std::string job_id= due->element[i]->str;
-        redisReply* job_json= (redisReply*)redisCommand(guard.get(), "Get Job:%s", job_id.c_str());
-         if(job_json == NULL || job_json->type== REDIS_REPLY_NIL){
+void Scheduler::tick(){ 
+    
+    try{
+        // fetching all the jobs from waiting_jobs whose run_at is less than current time
+        std::vector<std::string> due_jobs= q.get_due_waitingJobs();
+   
+        if(!due_jobs.empty()){
+            for(size_t i=0;i<due_jobs.size();i++){
+                
+                // fetching the jobs detail from redis
+                std::string job_id= due_jobs[i];
             
-            freeReplyObject(job_json);
-            continue;
-        }
-        Job job= json::parse(job_json->str);
-        freeReplyObject(job_json);
-        job.next_retry_at= 0;
-        q.R_queue_push(job);
-        redisCommand(guard.get(), "ZREM Waiting_jobs %s", job_id.c_str());
+                auto job_opt= q.queue_get_JobRecords(job_id);
+                if(job_opt.has_value()){
+                    Job job= job_opt.value();
+                    // push in the ready queue
+                    job.next_retry_at= 0;
+                    q.queue_push(job);
 
+                    // delete from waiting jobs 
+                    q.delete_from_waitingJobs(job_id);
+                }
+                else{
+                    std::cerr << "Job record not found for Job ID: " << job_id << "\n";
+                }
+            
+            }
+        }
+        else{
+            std::cerr << "No due waiting jobs found\n";
+        }
     }
-    freeReplyObject(due);
+    catch(const std::exception& e){
+        std::cerr << "Error in Scheduler tick: " << e.what() << "\n";
+    }
+      
 }
 
 int main(){
